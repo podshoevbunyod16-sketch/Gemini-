@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Media Studio | Текст, Изображения, Видео, Аудио</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0f1c 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #60a5fa, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .subtitle {
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card h2 i {
+            font-size: 1.8rem;
+        }
+        
+        textarea, input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 0.75rem;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            color: white;
+            font-family: inherit;
+            margin: 0.5rem 0;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            margin-top: 0.5rem;
+        }
+        
+        button:hover {
+            transform: scale(1.02);
+            opacity: 0.9;
+        }
+        
+        .result {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #0f172a;
+            border-radius: 0.75rem;
+            border-left: 3px solid #3b82f6;
+            word-wrap: break-word;
+        }
+        
+        .result img, .result video {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #1e293b;
+            padding: 0.25rem 1rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .container { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🎨 AI Media Studio</div>
+            <div class="subtitle">Генерация текста, изображений, видео и аудио через Hugging Face</div>
+            <div class="status-badge" style="margin-top: 1rem;">
+                <span class="dot"></span>
+                <span>Hugging Face API Active</span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- Текстовая генерация -->
+            <div class="card">
+                <h2><i class="fas fa-message"></i> Текст (Gemma 2)</h2>
+                <textarea id="textPrompt" placeholder="Напишите ваш запрос... Например: Расскажи о космических технологиях"></textarea>
+                <button onclick="generateText()">Сгенерировать текст</button>
+                <div id="textResult" class="result">Результат появится здесь...</div>
+            </div>
+
+            <!-- Генерация изображений -->
+            <div class="card">
+                <h2><i class="fas fa-image"></i> Изображение (SDXL)</h2>
+                <input type="text" id="imagePrompt" placeholder="Опишите желаемое изображение... Космический корабль на закате">
+                <button onclick="generateImage()">Создать изображение</button>
+                <div id="imageResult" class="result"></div>
+            </div>
+
+            <!-- Генерация видео -->
+            <div class="card">
+                <h2><i class="fas fa-video"></i> Видео (SVD)</h2>
+                <input type="file" id="videoInput" accept="image/*">
+                <button onclick="generateVideo()">Оживить изображение → видео</button>
+                <div id="videoResult" class="result"></div>
+            </div>
+
+            <!-- Аудио генерация -->
+            <div class="card">
+                <h2><i class="fas fa-headphones"></i> Аудио (TTS)</h2>
+                <textarea id="audioText" placeholder="Текст для озвучивания... Привет, это тест голосового синтеза"></textarea>
+                <button onclick="generateAudio()">Синтезировать речь</button>
+                <div id="audioResult" class="result"></div>
+            </div>
+
+            <!-- Анализ изображений -->
+            <div class="card">
+                <h2><i class="fas fa-brain"></i> Распознавание</h2>
+                <input type="file" id="analyzeInput" accept="image/*">
+                <button onclick="analyzeImage()">Что на картинке?</button>
+                <div id="analyzeResult" class="result"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function generateText() {
+            const prompt = document.getElementById('textPrompt').value;
+            if (!prompt) return alert('Введите запрос');
+            
+            const btn = event.target;
+            const resultDiv = document.getElementById('textResult');
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Генерация текста...';
+            
+            try {
+                const response = await fetch('/api/generate/text', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                resultDiv.innerHTML = `<strong>✨ Результат:</strong><br>${data.text}`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Ошибка: ${error.message}`;
+            }
+            btn.disabled = false;
+        }
+        
+        async function generateImage() {
+            const prompt = document.getElementById('imagePrompt').value;
+            if (!prompt) return alert('Введите описание');
+            
+            const btn = event.target;
+            const resultDiv = document.getElementById('imageResult');
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Создание изображения...';
+            
+            try {
+                const response = await fetch('/api/generate/image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                resultDiv.innerHTML = `<img src="data:image/png;base64,${data.image}" alt="generated">`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Ошибка: ${error.message}`;
+            }
+            btn.disabled = false;
+        }
+        
+        async function generateVideo() {
+            const file = document.getElementById('videoInput').files[0];
+            if (!file) return alert('Выберите изображение');
+            
+            const btn = event.target;
+            const resultDiv = document.getElementById('videoResult');
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Генерация видео (может занять время)...';
+            
+            try {
+                const response = await fetch('/api/generate/video', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                
+                if (data.video_url) {
+                    resultDiv.innerHTML = `<video controls src="${data.video_url}"></video>`;
+                } else {
+                    resultDiv.innerHTML = `<pre style="white-space: pre-wrap;">${data.message || data.example_code || 'Видео готово!'}</pre>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Ошибка: ${error.message}`;
+            }
+            btn.disabled = false;
+        }
+        
+        async function generateAudio() {
+            const text = document.getElementById('audioText').value;
+            if (!text) return alert('Введите текст');
+            
+            const btn = event.target;
+            const resultDiv = document.getElementById('audioResult');
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Синтез речи...';
+            
+            try {
+                const response = await fetch('/api/generate/audio', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text })
+                });
+                
+                if (!response.ok) throw new Error('Ошибка генерации');
+                
+                const audioBlob = await response.blob();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                resultDiv.innerHTML = `<audio controls src="${audioUrl}"></audio><br><small>Нажмите play для прослушивания</small>`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Ошибка: ${error.message}`;
+            }
+            btn.disabled = false;
+        }
+        
+        async function analyzeImage() {
+            const file = document.getElementById('analyzeInput').files[0];
+            if (!file) return alert('Выберите изображение');
+            
+            const btn = event.target;
+            const resultDiv = document.getElementById('analyzeResult');
+            
+            const formData = new FormData();
+            formData.append('image', file);
+            
+            btn.disabled = true;
+            resultDiv.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Анализ...';
+            
+            try {
+                const response = await fetch('/api/analyze/image', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.error) throw new Error(data.error);
+                resultDiv.innerHTML = `<strong>🔍 Описание:</strong><br>${data.description}`;
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Ошибка: ${error.message}`;
+            }
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
